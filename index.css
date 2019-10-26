@@ -1,0 +1,15 @@
+.azul{
+    background-color: lightblue;
+}
+
+.barra {
+    fill: blueviolet;
+    stroke: black;
+    stroke-width: 2px;
+}
+.rotulo{
+    text-anchor: middle;
+}
+#grafico{
+    border: 1px solid red;
+}
