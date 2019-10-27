@@ -8,12 +8,20 @@ function iniciar(){
     infererio: 20
   }
   
-  let dados = [100, 250, 150, 100, 80];
+  let dados = [
+    { nome: 'Frango', quantidade: 56 },
+    { nome: 'Carne', quantidade: 73 },
+    { nome: 'Vegetariano', quantidade: 20 },
+    { nome: 'Queijo', quantidade: 115 },
+    { nome: 'Goibada', quantidade: 44 },
+    { nome: 'Banana', quantidade: 60 },
+    { nome: 'Calabresa', quantidade: 33 }
+  ];
   const largura = 600;
   const altura = 400;
-  const min = d3.min(dados)
-  const max = d3.max(dados)
-  const faix = d3.extent(dados) // retorna um vetor minimo e maximo.
+  const min = d3.min(dados.map(d => d.quantidade)); //retorna menor valor
+  const max = d3.max(dados.map(d => d.quantidade)); //
+  const faixa = d3.extent(dados); // retorna um vetor minimo e maximo.
   let svg = d3.select('#grafico');
   svg.attr('width', largura).attr('height', altura);
  
@@ -23,29 +31,39 @@ function iniciar(){
   
   const larguraPlotagem = (largura - margem.esquerda -margem.direita); 
   const alturaPlotagem = (altura - margem.superior - margem.infererio);
-  const x = d3.scaleLinear().domain([0,dados.length]).range([0, larguraPlotagem]);
-  const y = d3.scaleLinear().domain([0, max]).range([alturaPlotagem, 0]);
+  const x = d3.scaleBand()
+              .domain(dados.map(d => d.nome) )
+              .range([0, larguraPlotagem])
+              .padding(0.1);
+  const y = d3.scaleLinear()
+              .domain([0, d3.max(dados.map(d => d.quantidade))])
+              .range([alturaPlotagem, 0]);
+  const cores = d3.scaleLinear()
+                  .domain([0, dados.length])
+                  .range(['#005a32', '#edf8e9'])
 
     plotagem.selectAll('.barra')
     .data(dados)
     .enter() //trata elementos a mais
       .append('rect')
       .classed('barra', true)
-      .attr('x',(d, i) => x(i))
-      .attr('y',  d=> y(d))
-      .attr('width', x(1)*0.9)
-      .attr('height', d => altura - y(d))
+      .attr('x',d => x(d.nome))
+      .attr('y',  d=> y(d.quantidade))
+      .attr('width', x.bandwidth())
+      .attr('height', d => altura - y(d.quantidade))
+      .attr('fill', (d,i) => cores(i));
 
     plotagem.selectAll('.rotulo')
     .data(dados)
     .enter() //trata elementos a mais
       .append('text')
       .classed('rotulo', true)
-      .text(d => d)
-      .attr('x', (d, i) => x(i))
-      .attr('y', d => y(d))
-      .attr('dx', d => x(1)*.9*0.5)
+      .text(d => d.quantidade)
+      .attr('x', d => x(d.nome))
+      .attr('y', d => y(d.quantidade))
+      .attr('dx', d => x.bandwidth()*0.5)
       .attr('dy', -5)
+
   //divs.exit() //trata os elementos a menos.
   //   .remove()
 }
